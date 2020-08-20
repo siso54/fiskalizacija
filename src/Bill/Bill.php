@@ -7,7 +7,7 @@ class Bill
 
     public $oib;
 
-    public $havePDV;
+    public $havePDV = true;
 
     public $dateTime;
 
@@ -37,11 +37,13 @@ class Bill
 
     public $securityCode;
 
-    public $noteOfRedelivary = false;
+    public $noteOfRedlivery = false;
 
     public $noteOfParagonBill;
 
     public $specificPurpose;
+
+    public $accompanyingDocumentSecurityCode = false;
 
     public function setOib($oib)
     {
@@ -108,7 +110,7 @@ class Bill
         $this->totalValue = $totalValue;
     }
 
-    public function setTypeOfPlacanje($typeOfPaying)
+    public function setPaymentType($typeOfPaying)
     {
         $this->typeOfPaying = $typeOfPaying;
     }
@@ -123,9 +125,9 @@ class Bill
         $this->securityCode = $securityCode;
     }
 
-    public function setNoteOfRedelivary($noteOfRedelivary)
+    public function setNoteOfRedlivery($noteOfRedlivery)
     {
-        $this->noteOfRedelivary = $noteOfRedelivary;
+        $this->noteOfRedlivery = $noteOfRedlivery;
     }
 
     public function setNoteOfParagonBill($noteOfParagonBill)
@@ -137,6 +139,12 @@ class Bill
     {
         $this->specificPurpose = $specificPurpose;
     }
+
+    public function setAccompanyingDocumentSecurityCode($accompanyingDocumentSecurityCode)
+    {
+        $this->accompanyingDocumentSecurityCode = $accompanyingDocumentSecurityCode;
+    }
+
 
     /**
      * Generiranje zaštitnog koda na temelju ulaznih parametara
@@ -215,10 +223,15 @@ class Bill
         }
         /*********************************************/
 
-        $writer->writeElementNs($ns, 'IznosOslobPdv', null, number_format($this->taxFreeValuePdv, 2, '.', ''));
-        $writer->writeElementNs($ns, 'IznosMarza', null, number_format($this->marginForTaxRate, 2, '.', ''));
-        $writer->writeElementNs($ns, 'IznosNePodlOpor', null, number_format($this->taxFreeValue, 2, '.', ''));
-
+        if ($this->taxFreeValuePdv) {
+            $writer->writeElementNs($ns, 'IznosOslobPdv', null, number_format($this->taxFreeValuePdv, 2, '.', ''));
+        }
+        if ($this->marginForTaxRate) {
+            $writer->writeElementNs($ns, 'IznosMarza', null, number_format($this->marginForTaxRate, 2, '.', ''));
+        }
+        if ($this->taxFreeValue) {
+            $writer->writeElementNs($ns, 'IznosNePodlOpor', null, number_format($this->taxFreeValue, 2, '.', ''));
+        }
         /*********** Naknada *************************/
         if (!empty($this->refund)) {
             $writer->startElementNs($ns, 'Naknade', null);
@@ -233,7 +246,12 @@ class Bill
         $writer->writeElementNs($ns, 'NacinPlac', null, $this->typeOfPaying);
         $writer->writeElementNs($ns, 'OibOper', null, $this->oibOperative);
         $writer->writeElementNs($ns, 'ZastKod', null, $this->securityCode);
-        $writer->writeElementNs($ns, 'NakDost', null, $this->noteOfRedelivary ? "true" : "false");
+        $writer->writeElementNs($ns, 'NakDost', null, $this->noteOfRedlivery ? "true" : "false");
+        if ($this->accompanyingDocumentSecurityCode) {
+            $writer->startElementNs($ns, 'PrateciDokument', null);
+            $writer->writeElementNs($ns, 'ZastKodPD', null, $this->accompanyingDocumentSecurityCode);
+            $writer->endElement();
+        }
 
         if ($this->noteOfParagonBill) {
             $writer->writeElementNs($ns, 'ParagonBrRac', null, $this->noteOfParagonBill);

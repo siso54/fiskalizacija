@@ -30,6 +30,7 @@ class Request
         $writer->setIndentString("    ");
         $writer->startElementNs($ns, $this->requestName, 'http://www.apis-it.hr/fin/2012/types/f73');
         $writer->writeAttribute('Id', uniqid());
+        // $writer->writeAttributeNs('xmlns', 'xsi', 'http://www.w3.org/2001/XMLSchema-instance', 'http://www.w3.org/2001/XMLSchema-instance');
         $writer->startElementNs($ns, 'Zaglavlje', null);
         $writer->writeElementNs($ns, 'IdPoruke', null, $this->generateUUID());
         $writer->writeElementNs($ns, 'DatumVrijeme', null, \Carbon\Carbon::now()->format('d.m.Y\TH:i:s'));

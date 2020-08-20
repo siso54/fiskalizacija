@@ -20,7 +20,7 @@ class Fiskalizacija
     private $security;
     private $url = "https://cis.porezna-uprava.hr:8449/FiskalizacijaService";
 
-    public function __construct($path, $pass, $security = 'SSL', $demo = false)
+    public function __construct($path, $pass, $security = 'TLS', $demo = false)
     {
         if ($demo == true) {
             $this->url = "https://cistest.apis-it.hr:8449/FiskalizacijaServiceTest";
@@ -66,7 +66,7 @@ class Fiskalizacija
         $SignatureNode->setAttribute('xmlns', 'http://www.w3.org/2000/09/xmldsig#');
 
         $SignedInfoNode = $SignatureNode->appendChild(new DOMElement('SignedInfo'));
-        $SignedInfoNode->setAttribute('xmlns', 'http://www.w3.org/2000/09/xmldsig#');
+        // $SignedInfoNode->setAttribute('xmlns', 'http://www.w3.org/2000/09/xmldsig#');
 
         $CanonicalizationMethodNode = $SignedInfoNode->appendChild(new DOMElement('CanonicalizationMethod'));
         $CanonicalizationMethodNode->setAttribute('Algorithm', 'http://www.w3.org/2001/10/xml-exc-c14n#');
@@ -94,8 +94,8 @@ class Fiskalizacija
 
         $X509Issuer = $this->publicCertificateData['issuer'];
         $X509IssuerName = sprintf(
-            'OU=%s,O=%s,C=%s',
-            $X509Issuer['OU'] ?? '',
+            'CN=%s,O=%s,C=%s',
+            $X509Issuer['CN'] ?? '',
             $X509Issuer['O'] ?? '',
             $X509Issuer['C'] ?? ''
         );
@@ -103,6 +103,8 @@ class Fiskalizacija
 
         $publicCertificatePureString = str_replace('-----BEGIN CERTIFICATE-----', '', $this->certificate['cert']);
         $publicCertificatePureString = str_replace('-----END CERTIFICATE-----', '', $publicCertificatePureString);
+        // $publicCertificatePureString = trim($publicCertificatePureString);
+        $publicCertificatePureString = preg_replace('/\s+/', '', $publicCertificatePureString);
 
         $this->signedInfoSignature = null;
 
@@ -211,6 +213,9 @@ class Fiskalizacija
     public function parseResponse($response, $code = 4)
     {
         if ($code === 200) {
+
+            // var_dump($response);
+
             $DOMResponse = new DOMDocument();
             $DOMResponse->loadXML($response);
 
