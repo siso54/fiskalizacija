@@ -35,9 +35,9 @@ class QRCode
 
     private function getQR() {
         $qrCode = new EQRCode($this->qrText);
-        // $qrCode->setSize(150);
-        $qrCode->setWriterByName('png');
+        $qrCode->setSize(200);
         $qrCode->setMargin(10);
+        $qrCode->setWriterByName('png');
         $qrCode->setEncoding('UTF-8');
         $qrCode->setErrorCorrectionLevel(ErrorCorrectionLevel::HIGH());
         $qrCode->setForegroundColor(['r' => 0, 'g' => 0, 'b' => 0, 'a' => 0]);
