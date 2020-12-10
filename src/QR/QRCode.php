@@ -16,7 +16,7 @@ class QRCode
         }
         \Carbon\Carbon::createFromFormat(self::DATE_TIME_FORMAT, $dateTime);
         $codeParamName = strlen($code) == 32 ? 'zki' : 'jir';
-        $this->qrText = self::QR_URL . '?' . $codeParamName . '=' . $code .'&datv=' . $dateTime . '&izn=' .  number_format($totalValue, 2, ',', '');
+        $this->qrText = self::QR_URL . '?' . $codeParamName . '=' . $code .'&datv=' . $dateTime . '&izn=' .  number_format($totalValue, 2, '', '');
     }
 
     public function getQRText() {
